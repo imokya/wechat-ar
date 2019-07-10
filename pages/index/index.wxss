@@ -1,0 +1,16 @@
+/**index.wxss**/
+camera {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+}
+
+canvas {
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent !important;
+  position: absolute;
+  top: 0;
+  z-index: 20;
+}
