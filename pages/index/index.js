@@ -4,8 +4,7 @@ import ARUCO from '../../libs/vendors/aruco/index'
 const app = getApp()
 let camera, scene, renderer, canvas
 let id, torus, markerGroup
-let frame, visible = false
-let visibleTime = +new Date
+let frame, visibleTime = +new Date
 
 Page({
 
@@ -22,7 +21,7 @@ Page({
 
   detect() {
     if (!frame) return
-    if(+new Date - visibleTime > 1000 && !visible) {
+    if(+new Date - visibleTime > 500) {
       markerGroup.visible = false
     }
     const data = new Uint8Array(frame.data)
@@ -37,12 +36,10 @@ Page({
         case 1001:
           this.markerToObject3D(marker, markerGroup, frame)
           visibleTime = +new Date
-          visible = true
           markerGroup.visible = true
           break
       }
     })
-    visible = false
   },
 
   markerToObject3D(marker, object3d, frame) {
@@ -62,7 +59,6 @@ Page({
     const rotation = pose.bestRotation
     const translation = pose.bestTranslation
     
-    object3d.visible = true
     object3d.scale.x = modelSize
     object3d.scale.y = modelSize
     object3d.scale.z = modelSize
@@ -95,7 +91,6 @@ Page({
     torus = new THREE.Mesh(TorusGeo, TorusMat)
     markerGroup.add(torus)
     scene.add(markerGroup)
-    visible = false
 
     const cubeGeo = new THREE.CubeGeometry(1, 1, 1)
     const cubeMat = new THREE.MeshNormalMaterial({
