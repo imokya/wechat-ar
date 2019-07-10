@@ -107,7 +107,7 @@ Page({
   render() {
     this.detect()
     torus.rotation.y += 0.03
-		torus.rotation.z += 0.03
+    torus.rotation.z += 0.03
     renderer.render(scene, camera)
     id = canvas.requestAnimationFrame(this.render.bind(this))
   },
