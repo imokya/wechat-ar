@@ -1,132 +1,165 @@
 import * as THREE from '../../libs/vendors/three'
-import ARUCO from '../../libs/vendors/aruco/index'
+import * as THREEAR from '../../libs/vendors/THREEAR'
 
-const app = getApp()
 let camera, scene, renderer, canvas
 let id, torus, markerGroup
-let frame, visibleTime = +new Date
+let frame, controller, lastTime = 0
+let inited = false
+let w, h
+let frameSliceIndex
+
+const app = getApp()
+const RATIO = 4/3
 
 Page({
 
   data: {
+    canvasStyle: '',
+    cameraStyle: ''
+  },
+  
+  initStyles() {
+    const info = wx.getSystemInfoSync()
+    w = info.windowWidth
+    h = w / RATIO | 0
+    const style = `width:${w}px;height:${h}px;`
+    this.setData({
+      canvasStyle: style,
+      cameraStyle: style
+    })
   },
 
   initCamera() {
+    const info = wx.getSystemInfoSync()
     const context = wx.createCameraContext()
     const listener = context.onCameraFrame((_frame) => {
       frame = _frame
+      if (!inited) {
+        this.initScene()
+        inited = true
+      }
     })
     listener.start()
   },
 
-  detect() {
-    if (!frame) return
-    if(+new Date - visibleTime > 500) {
-      markerGroup.visible = false
-    }
-    const data = new Uint8Array(frame.data)
-    const detector = new ARUCO.AR.Detector()
-    const markers = detector.detect({
-      width: frame.width,
-      height: frame.height,
-      data
+  debug() {
+    const info = wx.getSystemInfoSync()
+    const tw = info.windowWidth
+    const th = info.windowHeight
+    const sw = info.screenWidth
+    const sh = info.screenHeight
+
+    wx.showModal({
+      title: '提示',
+      content: `w: ${tw} h: ${th}`
     })
-    markers.forEach(marker=> {
-      switch(marker.id) {
-        case 1001:
-          this.markerToObject3D(marker, markerGroup, frame)
-          visibleTime = +new Date
-          markerGroup.visible = true
-          break
-      }
-    })
-  },
-
-  markerToObject3D(marker, object3d, frame) {
-    const corners = []
-    const modelSize = 55.0
-    for (let i = 0; i < marker.corners.length; ++i){
-      corners.push({
-        x : marker.corners[i].x - (frame.width / 2),
-        y : (frame.height / 2) - marker.corners[i].y,
-      })
-    }
-
-    const posit = new ARUCO.POS.Posit(modelSize, frame.width)
-    const pose = posit.pose(corners)
-    if( pose === null ) return
-
-    const rotation = pose.bestRotation
-    const translation = pose.bestTranslation
-    
-    object3d.scale.x = modelSize
-    object3d.scale.y = modelSize
-    object3d.scale.z = modelSize
-  
-    object3d.rotation.x = -Math.asin(-rotation[1][2])
-    object3d.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2])
-    object3d.rotation.z =  Math.atan2(rotation[1][0], rotation[1][1])
-  
-    object3d.position.x =  translation[0]
-    object3d.position.y =  translation[1]
-    object3d.position.z = -translation[2]
-
   },
 
   initScene() {
-    const w = wx.getSystemInfoSync().windowWidth
-    const h = wx.getSystemInfoSync().windowHeight
-    scene = new THREE.Scene()
-    camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000)
-    camera.position.z = 5
+
+    const vw = frame.width
+    const vh = vw / RATIO | 0
+
     renderer = new THREE.WebGLRenderer({
-      canvas,
       alpha: true,
+      canvas,
       antialias: false
     })
+
     renderer.setSize(w, h)
+
+    scene = new THREE.Scene()
+    camera = new THREE.Camera()
+    scene.add(camera)
+
     markerGroup = new THREE.Group()
-    const TorusGeo = new THREE.TorusKnotGeometry(0.3, 0.1, 64, 16)
-    const TorusMat = new THREE.MeshNormalMaterial()
-    torus = new THREE.Mesh(TorusGeo, TorusMat)
-    markerGroup.add(torus)
     scene.add(markerGroup)
 
+    const source = new THREEAR.Source({ 
+      renderer, 
+      camera
+    })
+
+    THREEAR.initialize({ 
+      source, 
+      canvasWidth: vw,
+      canvasHeight: vh
+    }).then((_controller) => {
+      controller = _controller
+      this.initialize(_controller)
+      this.render()
+    })
+
+    frameSliceIndex = vw * (frame.height - vh) * 4
+    
+  },
+
+  initialize(controller) {
+    const torusGeo = new THREE.TorusKnotGeometry(0.3, 0.1, 64, 16)
+    const torusMat = new THREE.MeshNormalMaterial()
+    torus = new THREE.Mesh(torusGeo, torusMat)
+    torus.position.y = 0.5
+
+    /*
+    const axesHelper = new THREE.AxesHelper(5)
+    markerGroup.add(axesHelper)
+    */
+
+    markerGroup.add(torus)
     const cubeGeo = new THREE.CubeGeometry(1, 1, 1)
     const cubeMat = new THREE.MeshNormalMaterial({
-      transparent: true,
+      transparent : true,
       opacity: 0.5,
       side: THREE.DoubleSide
     })
     const cube = new THREE.Mesh(cubeGeo, cubeMat)
+    cube.position.y	= cubeGeo.parameters.height / 2
     markerGroup.add(cube)
-    markerGroup.visible = false
-    this.render()
+
+    const patternMarker = new THREEAR.PatternMarker({
+      patternUrl: 'https://www.xingway.com/ar/data/patt.hiro',
+      markerObject: markerGroup
+    })
+    controller.trackMarker(patternMarker)
   },
 
-  render() {
-    this.detect()
-    torus.rotation.y += 0.03
-    torus.rotation.z += 0.03
-    renderer.render(scene, camera)
+  render(now) {
+    if (frame) {
+      lastTime = lastTime || now - 1000 / 60
+      const delta = Math.min(200, now - lastTime)
+      lastTime = now
+      let rawData = new Uint8Array(frame.data)
+      rawData = this.sliceData(rawData)
+      controller.update(rawData)
+      torus.rotation.y += delta / 1000 * Math.PI
+      torus.rotation.z += delta / 1000 * Math.PI
+      renderer.render(scene, camera)
+    }
     id = canvas.requestAnimationFrame(this.render.bind(this))
+  },
+
+  sliceData(rawData) {
+    return rawData.slice(frameSliceIndex)
   },
 
   initCanvas() {
     const query = wx.createSelectorQuery()
-    query.select('#mycanvas').node().exec((res) => {
+    query.select('#webgl').node().exec((res) => {
       canvas = res[0].node
-      this.initScene()
+      this.initStyles()
+      this.initCamera()
     })
   },
+
   onLoad() {
     wx.setNavigationBarTitle({
       title: '小程序AR测试'
     })
-    this.initCamera()
     this.initCanvas()
   },
+
   onUnload() {
     canvas.cancelAnimationFrame(id)
   }
+
 })

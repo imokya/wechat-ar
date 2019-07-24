@@ -6,8 +6,8 @@
 	"setting": {
 		"urlCheck": false,
 		"es6": true,
-		"postcss": true,
-		"minified": false,
+		"postcss": false,
+		"minified": true,
 		"newFeature": true,
 		"nodeModules": false,
 		"autoAudits": true,

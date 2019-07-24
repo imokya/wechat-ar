@@ -1,0 +1,5 @@
+<!-- index.wxml -->
+<view class="container">
+  <camera device-position="back" flash="off" frame-size="small"></camera>
+  <canvas type="webgl" id="mycanvas" canvas-id="mycanvas"></canvas>
+</view>

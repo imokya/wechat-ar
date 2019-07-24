@@ -1,5 +1,5 @@
 <!-- index.wxml -->
 <view class="container">
-  <camera device-position="back" flash="off" frame-size="small"></camera>
-  <canvas type="webgl" id="mycanvas" canvas-id="mycanvas"></canvas>
+  <camera device-position="back" flash="off" frame-size="small" style="{{ cameraStyle }}"></camera>
+  <canvas type="webgl" id="webgl" canvas-id="webgl" style="{{ canvasStyle }}"></canvas>
 </view>
