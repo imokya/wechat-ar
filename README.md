@@ -7,6 +7,6 @@
 ### 说明
 
 * 通过修改jsartoolkit的相机标定（camera calibration）文件，可以实现不同比例源识别。
-* 该示例目前只在安卓微信环境下测试过，ios小程序存在卡顿或无法识别的现象。
+* 该示例目前只在安卓环境下测试过，ios小程序存在卡顿或无法识别的现象。
 
 [演示视频](https://h5.weishi.qq.com/weishi/feed/79CP0kmp21IoSs8iG)
