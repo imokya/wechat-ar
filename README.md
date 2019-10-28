@@ -8,4 +8,4 @@
 * 目前jsARToolkit只支持4/3分辨率的视频源，如需要全屏必须对组件进行缩放操作。
 * 该示例目前只在安卓微信环境下测试过。
 
-[演示视频](https://h5.weishi.qq.com/weishi/feed/79CP0kmp21HQ7giOE)
+[演示视频](https://h5.weishi.qq.com/weishi/feed/79CP0kmp21IoSs8iG)
