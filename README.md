@@ -4,8 +4,7 @@
 
 ### 说明
 
-* 经测试小程序相关的API还不太稳定且存在bug，谨慎用于项目。
-* 目前jsARToolkit只支持4/3分辨率的视频源，如需要全屏必须对组件进行缩放操作。
-* 该示例目前只在安卓微信环境下测试过。
+* 通过修改jsartoolkit的相机标定（camera calibration）文件，可以实现不同比例源识别。
+* 该示例目前只在安卓微信环境下测试过，ios微信存在卡顿或无法识别的现象。
 
 [演示视频](https://h5.weishi.qq.com/weishi/feed/79CP0kmp21IoSs8iG)
