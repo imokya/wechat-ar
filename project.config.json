@@ -6,18 +6,24 @@
 	"setting": {
 		"urlCheck": false,
 		"es6": true,
-		"postcss": false,
+		"postcss": true,
 		"minified": true,
 		"newFeature": true,
-		"nodeModules": false,
-		"autoAudits": true,
-		"uglifyFileName": false,
-		"checkInvalidKey": true
+		"coverView": true,
+		"autoAudits": false,
+		"checkInvalidKey": true,
+		"checkSiteMap": true,
+		"uploadWithSourceMap": true,
+		"babelSetting": {
+			"ignore": [],
+			"disablePlugins": [],
+			"outputPath": ""
+		}
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.7.3",
+	"libVersion": "2.9.0",
 	"appid": "wx3544aa94c9787dcf",
-	"projectname": "%E5%B0%8F%E7%A8%8B%E5%BA%8FAR%E6%B5%8B%E8%AF%95",
+	"projectname": "ar",
 	"debugOptions": {
 		"hidedInDevtools": []
 	},

@@ -1,14 +1,13 @@
-/**index.wxss**/
-camera {
-  width: 360px;
-  height: 270px;
+canvas {
+  width: 480px;
+  height: 853px;
   position: absolute;
+  z-index: 20;
 }
 
-canvas {
-  width: 360px;
-  height: 270px;
+camera {
+  width: 480px;
+  height: 640px;
   position: absolute;
-  top: 0;
-  z-index: 20;
+  z-index: 10;
 }
