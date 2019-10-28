@@ -1,7 +1,7 @@
 ## 微信小程序AR Marker
 
 该示例基于[THREEAR](https://github.com/JamesMilnerUK/THREEAR)库，并针对小程序运行环境，对基础库jsARToolkit进行了重新编译和修改。
-修改后的版本(https://github.com/imokya/threear-wechat)
+[修改后的版本](https://github.com/imokya/threear-wechat)
 
 ### 说明
 
